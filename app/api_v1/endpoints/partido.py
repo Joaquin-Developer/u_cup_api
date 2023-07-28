@@ -53,11 +53,16 @@ def update_partido_fase_final(partido_id: int, partido_data: PartidoUpdate):
     if not partido:
         raise HTTPException(status_code=404, detail="Partido no encontrado")
 
+    penales_loc = partido_data.penales_local or "null"
+    penales_vis = partido_data.penales_visitante or "null"
+
     query = f"""
     UPDATE enfrentamientos
     SET
         goles_local = {partido_data.goles_local},
-        goles_visitante = {partido_data.goles_visitante}
+        goles_visitante = {partido_data.goles_visitante},
+        penales_local = {penales_loc},
+        penales_visitante = {penales_vis}
     WHERE
         id = {partido_id}
     """

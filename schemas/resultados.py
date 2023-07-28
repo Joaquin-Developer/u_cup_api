@@ -1,3 +1,4 @@
+from typing import Any
 from pydantic import BaseModel
 
 
@@ -20,6 +21,8 @@ class ResultadoFase(BaseModel):
     goles_local: int
     equipo_visitante: str
     goles_visitante: int
+    penales_local: Any
+    penales_visitante: Any
     status_partido: str
 
 
