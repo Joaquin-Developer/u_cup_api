@@ -90,6 +90,8 @@ def get_resultados_fase(fase_id: int):
             coalesce(p.goles_local, 0) as goles_local,
             vis.nombre as nombre_visitante,
             coalesce(p.goles_visitante, 0) as goles_visitante,
+            p.penales_local,
+            p.penales_visitante,
             case
                 when p.goles_local is null then 'NO JUGADO'
                 else 'JUGADO'
@@ -115,7 +117,9 @@ def get_resultados_fase(fase_id: int):
             goles_local=partido[3],
             equipo_visitante=partido[4],
             goles_visitante=partido[5],
-            status_partido=partido[6]
+            penales_local=partido[6],
+            penales_visitante=partido[7],
+            status_partido=partido[8]
         )
         res.append(resultado)
     return res
