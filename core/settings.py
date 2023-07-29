@@ -8,5 +8,7 @@ class Settings(BaseSettings):
 
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
+    STATISTICS_SERVICE_URL: str = "http://127.0.0.1:8001"
+
 
 settings = Settings()

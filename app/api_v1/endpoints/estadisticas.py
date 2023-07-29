@@ -33,49 +33,20 @@ def estadisticas_grupo(grupo_id: int):
     (equipo, pts, posicion, goles_favor, goles_contra)
     """
     query = f"""
-        with estadisticas as (
-            select
-                g.nombre as grupo,
-                e.id as equipo_id,
-                e.nombre,
-                sum(
-                    case when e.id = p.local_id then
-                        -- partidos local
-                        case
-                            when p.goles_local > p.goles_visitante then 3
-                            when p.goles_local = p.goles_visitante then 1
-                            else 0
-                        end
-                    else
-                        -- partidos visitante
-                        case
-                            when p.goles_visitante > p.goles_local then 3
-                            when p.goles_visitante = p.goles_local then 1
-                            else 0
-                        end
-                    end
-                ) as pts,
-                sum(
-                    case when e.id = p.local_id then p.goles_local else p.goles_visitante end
-                ) as goles_favor,
-                sum(
-                    case when e.id != p.local_id then p.goles_local else p.goles_visitante end
-                ) as goles_contra 
-            from
-                equipos e
-                join equipos_grupos eg on e.id = eg.equipo_id
-                join grupos g on eg.grupo_id = g.id
-                join partidos p on e.id = p.local_id or e.id = p.visitante_id
-            where eg.grupo_id = {grupo_id}
-            group by
-                e.id,
-                e.nombre
-        )
         select
-            e.*,
-            e.goles_favor - e.goles_contra as diferencia
-        from estadisticas e
-        order by e.pts desc, (e.goles_favor - e.goles_contra) desc
+            g.nombre as grupo,
+            e.equipo_id,
+            eq.nombre,
+            e.pts,
+            e.goles_favor,
+            e.goles_contra,
+            e.diferencia
+        from
+            estadisticas_grupo e
+            join grupos g on e.grupo_id = g.id
+            join equipos eq on e.equipo_id = eq.id
+        where grupo_id = {grupo_id}
+        order by e.pts desc, e.diferencia desc
     """
     data = execute_query(sql=query, return_data=True)
     res = []
@@ -101,71 +72,26 @@ def equipos_clasificados():
     (equipo, pts, posicion, goles_favor, goles_contra)
     """
     query = """
-        WITH estadisticas AS (
-            with _estadisticas as (
-                select
-                    g.nombre as grupo,
-                    e.id as equipo_id,
-                    e.nombre,
-                    sum(
-                    case when e.id = p.local_id then
-                        -- partidos local
-                        case
-                        when p.goles_local > p.goles_visitante then 3
-                        when p.goles_local = p.goles_visitante then 1
-                        else 0
-                        end
-                    else
-                        -- partidos visitante
-                        case
-                        when p.goles_visitante > p.goles_local then 3
-                        when p.goles_visitante = p.goles_local then 1
-                        else 0
-                        end
-                    end
-                    ) as pts,
-                    sum(
-                        case when e.id = p.local_id then p.goles_local else p.goles_visitante end
-                    ) as goles_favor,
-                    sum(
-                        case when e.id != p.local_id then p.goles_local else p.goles_visitante end
-                    ) as goles_contra 
-                from
-                    equipos e
-                    join equipos_grupos eg on e.id = eg.equipo_id
-                    join grupos g on eg.grupo_id = g.id
-                    join partidos p on e.id = p.local_id or e.id = p.visitante_id
-                group by
-                    e.id,
-                    e.nombre
-            )
+        with estadisticas as (
             select
-                e.*,
-                e.goles_favor - e.goles_contra as diferencia
-            from _estadisticas e
-            order by e.pts desc, (e.goles_favor - e.goles_contra) desc
-        ),
-        clasificados AS (
-            SELECT
-                grupo,
-                equipo_id,
-                nombre,
-                pts,
-                goles_favor,
-                goles_contra,
-                ROW_NUMBER() OVER (PARTITION BY grupo ORDER BY pts DESC, (goles_favor - goles_contra) DESC) AS posicion
-            FROM estadisticas
+                g.nombre as grupo,
+                ROW_NUMBER() OVER (PARTITION BY g.nombre ORDER BY e.pts DESC, e.diferencia DESC) AS equipo_posicion,
+                e.equipo_id,
+                eq.nombre,
+                e.pts,
+                e.goles_favor,
+                e.goles_contra,
+                e.diferencia
+            from
+                estadisticas_grupo e
+                join grupos g on e.grupo_id = g.id
+                join equipos eq on e.equipo_id = eq.id
+            order by e.pts desc, e.diferencia desc
         )
-        SELECT
-            grupo,
-            posicion as equipo_posicion,
-            equipo_id,
-            nombre,
-            pts,
-            goles_favor,
-            goles_contra
-        FROM clasificados
-        WHERE posicion <= 2;
+        select e.*
+        from estadisticas e
+        where e.equipo_posicion <= 2
+        order by grupo asc, equipo_posicion asc
     """
     data = execute_query(sql=query, return_data=True)
     res = []
