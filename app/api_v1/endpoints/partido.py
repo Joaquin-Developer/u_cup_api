@@ -1,33 +1,50 @@
+from typing import List
+import requests
 from fastapi import APIRouter, HTTPException
 import pymysql
 
 from schemas.partidos import PartidoUpdate
 from db.db import DATABASE
 import app.api_v1.endpoints.fase_final as fase_final
+from core.settings import settings
 
 
 router = APIRouter()
 
 
-def update_partido_grupo(partido_id: int, partido_data: PartidoUpdate):
+def _update_partido(partido_id: int, partido_data: PartidoUpdate, table: str):
     """
-    Ruta para actualizar el resultado de un partido
+    Actualizar el resultado de un partido segun la fase
+    table: ["partidos", "enfrentamientos"]
     """
     connection = pymysql.connect(**DATABASE)
     cursor = connection.cursor()
 
     # Obtener el partido por su ID
-    query = f"SELECT * FROM partidos WHERE id = {partido_id}"
+    query = f"SELECT * FROM {table} WHERE id = {partido_id}"
     cursor.execute(query)
     partido = cursor.fetchone()
     if not partido:
         raise HTTPException(status_code=404, detail="Partido no encontrado")
 
+
+    if table == "enfrentamientos":
+        penales_loc = partido_data.penales_local or "null"
+        penales_vis = partido_data.penales_visitante or "null"
+        penales_sql = f"""
+        ,
+            penales_local = {penales_loc},
+            penales_visitante = {penales_vis}
+        """
+    else:
+        penales_sql = ""
+
     query = f"""
-    UPDATE partidos
+    UPDATE {table}
     SET
         goles_local = {partido_data.goles_local},
         goles_visitante = {partido_data.goles_visitante}
+        {penales_sql}
     WHERE
         id = {partido_id}
     """
@@ -36,48 +53,32 @@ def update_partido_grupo(partido_id: int, partido_data: PartidoUpdate):
     cursor.close()
     connection.close()
 
-    return {"message": "Resultado actualizado"}
+    local_id, visitante_id = partido[1], partido[2]
+    return local_id, visitante_id
 
 
-def update_partido_fase_final(partido_id: int, partido_data: PartidoUpdate):
+def update_statistics(fase: str, local_id: int, visitante_id: int):
     """
-    Ruta para actualizar el resultado de un partido de la fase final
+    Llamada al microservicio de estadisticas para actualizar estadisticas
     """
-    connection = pymysql.connect(**DATABASE)
-    cursor = connection.cursor()
+    url = f"{settings.STATISTICS_SERVICE_URL}/estadisticas/{fase}"
+    url += f"?equipos_id={local_id}&equipos_id={visitante_id}"
 
-    # Obtener el partido por su ID
-    query = f"SELECT * FROM enfrentamientos WHERE id = {partido_id}"
-    cursor.execute(query)
-    partido = cursor.fetchone()
-    if not partido:
-        raise HTTPException(status_code=404, detail="Partido no encontrado")
-
-    penales_loc = partido_data.penales_local or "null"
-    penales_vis = partido_data.penales_visitante or "null"
-
-    query = f"""
-    UPDATE enfrentamientos
-    SET
-        goles_local = {partido_data.goles_local},
-        goles_visitante = {partido_data.goles_visitante},
-        penales_local = {penales_loc},
-        penales_visitante = {penales_vis}
-    WHERE
-        id = {partido_id}
-    """
-    cursor.execute(query)
-    connection.commit()
-    cursor.close()
-    connection.close()
-
-    return {"message": "Resultado actualizado"}
+    resp = requests.post(url)
+    if resp.status_code != 200:
+        # cambiar estos print() por logging:
+        print("[WARNING] - No se pudo actualizar las estadisticas")
+        print(resp.json())
 
 
 @router.put("/partidos/{partido_id}")
 def update_partido(partido_id: int, partido_data: PartidoUpdate):
+    fase_actual = fase_final.get_fase_actual()["fase_actual"]
 
-    if fase_final.get_fase_actual()["fase_actual"] == "Fase de Grupos":
-        update_partido_grupo(partido_id, partido_data)
-    else:
-        update_partido_fase_final(partido_id, partido_data)
+    table = "partidos" if fase_actual == "Fase de Grupos" else "enfrentamientos"
+    statistic_fase = "grupo" if fase_actual == "Fase de Grupos" else "general"
+
+    local_id, visitante_id = _update_partido(partido_id, partido_data, table)
+    update_statistics(statistic_fase, local_id, visitante_id)
+
+    return {"message": "Resultado actualizado"}
