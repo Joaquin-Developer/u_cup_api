@@ -29,21 +29,28 @@ def execute_query(sql: str, return_data=False):
 def get_fase_actual():
     query = """
         WITH fase_actual AS (
-            SELECT nombre
+            SELECT id, nombre
             FROM fases
             WHERE id = (
                 SELECT MAX(fase_id) 
                 FROM enfrentamientos
             )
         )
-        SELECT nombre
+        SELECT
+            id,
+            nombre
         FROM fase_actual
         UNION ALL
-        SELECT 'Fase de Grupos'
+        SELECT
+            0 as id,
+            'Fase de Grupos' as nombre
         FROM dual
         WHERE NOT EXISTS (SELECT * FROM fase_actual)
     """
     # mejorar esto!
-    data = execute_query(sql=query, return_data=True)[0][0]
+    data = execute_query(sql=query, return_data=True)
 
-    return {"fase_actual": data}
+    return {
+        "id": data[0][0],
+        "nombre": data[0][1]
+    }
