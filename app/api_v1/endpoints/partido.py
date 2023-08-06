@@ -73,7 +73,7 @@ def update_statistics(fase: str, local_id: int, visitante_id: int):
 
 @router.put("/partidos/{partido_id}")
 def update_partido(partido_id: int, partido_data: PartidoUpdate):
-    fase_actual = fase_final.get_fase_actual()["fase_actual"]
+    fase_actual = fase_final.get_fase_actual()["nombre"]
 
     table = "partidos" if fase_actual == "Fase de Grupos" else "enfrentamientos"
     statistic_fase = "grupo" if fase_actual == "Fase de Grupos" else "general"
