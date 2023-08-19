@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api_v1.endpoints import partido, resultados, equipos, estadisticas, fase_final
+from app.api_v1.endpoints import metadata, partido, resultados, equipos, estadisticas, fase_final
 
 api_router = APIRouter()
 
@@ -9,3 +9,4 @@ api_router.include_router(resultados.router, prefix="/resultados", tags=["result
 api_router.include_router(equipos.router, prefix="/equipos", tags=["equipos"])
 api_router.include_router(estadisticas.router, prefix="/estadisticas", tags=["estadisticas"])
 api_router.include_router(fase_final.router, prefix="/fase_final", tags=["fase_final"])
+api_router.include_router(metadata.router, prefix="/metadata", tags=["metadata"])
