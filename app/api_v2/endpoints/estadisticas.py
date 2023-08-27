@@ -38,7 +38,7 @@ def estadisticas_grupo(grupo_id: int):
     query = text(query.format(grupo_id=grupo_id))
 
     with get_session() as session:
-        result = session.execute(query).fetchall()
+        results = session.execute(query).fetchall()
 
     return [
         dict(zip(row._mapping.keys(), row))
