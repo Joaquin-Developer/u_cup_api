@@ -49,7 +49,7 @@ def get_fase_actual():
     return fases.FaseActual(id=row.id, nombre=row.nombre, ida_vuelta=row.ida_vuelta)
 
 
-def _update_partido(partido_id: int, partido_data: partidos.PartidoUpdate, table: str, fase_id: int) -> Tuple[int, int]:
+def _update_partido(partido_id: int, partido_data: partidos.PartidoUpdate, fase_id: int) -> Tuple[int, int]:
     """
     Actualizar el resultado de un partido segun la fase
     fase_id: [0, 1, ..., n]
