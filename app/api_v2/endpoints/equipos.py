@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter
 
 from schemas import equipo
@@ -9,7 +10,7 @@ from models.grupo import Grupo
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/", response_model=List[equipo.Equipo])
 def get_equipos():
     with get_session() as session:        
         results = session.query(
