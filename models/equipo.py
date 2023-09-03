@@ -13,6 +13,6 @@ class Equipo(Base):
     pts = Column(Integer)
     goles_favor = Column(Integer)
     goles_contra = Column(Integer)
-    estadisticas = relationship("EstadisticasGrupo", back_populates="equipo")
+    # estadisticas = relationship("EstadisticasGrupo", back_populates="equipo")
 
     # grupos = relationship("EquipoGrupo", back_populates="equipo")

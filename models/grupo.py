@@ -10,7 +10,7 @@ class Grupo(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(VARCHAR(10))
 
-    estadisticas = relationship("EstadisticasGrupo", back_populates="grupo")
+    # estadisticas = relationship("EstadisticasGrupo", back_populates="grupo")
     
 
     # equipos = relationship("EquipoGrupo", back_populates="grupo", cascade="all, delete")

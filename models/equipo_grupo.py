@@ -11,6 +11,7 @@ class EquipoGrupo(Base):
     id = Column(Integer, primary_key=True, index=True)
     equipo_id = Column(Integer, ForeignKey("equipos.id"))
     grupo_id = Column(Integer, ForeignKey("grupos.id"))
+    equipo_posicion = Column(Integer)
 
     equipo = relationship("Equipo", back_populates="grupos")
     grupo = relationship("Grupo", back_populates="equipos", secondary="equipos_grupos")
