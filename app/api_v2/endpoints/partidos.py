@@ -1,11 +1,13 @@
 import logging
-from typing import Tuple
+from typing import List, Tuple
 import requests
 from sqlalchemy.sql import text
 from fastapi import APIRouter, HTTPException
 
 from core.database import get_session
 from models.partidos import Partido
+from models.grupo import Grupo
+from models.equipo import Equipo
 from models.enfrentamiento import Enfrentamiento
 from schemas import fases
 from schemas import partidos
@@ -168,7 +170,7 @@ def get_partidos_fase(fase_id: int):
         ).filter(Grupo.id == grupo_id).order_by(Partido.id.asc())
 
     return [
-        ResultadoFase(
+        res.ResultadoFase(
             fecha=result.fecha,
             grupo=result.nombre,
             equipo_local=result.nombre_local,
@@ -231,14 +233,14 @@ def get_partidos_equipo(equipo_nombre: int):
     with get_session() as session:
         results = session.execute(query).fetchall()
     return [
-        ResultadoEquipo(
+        res.ResultadoEquipo(
             id_partido=result.id_partido,
             fase=result.fase,
             grupo=result.grupo,
             equipo_local=result.equipo_local,
             goles_local=result.goles_local,
-            equipo_visitante=result.equipo_visitante
-            goles_visitante=result.goles_visitante
+            equipo_visitante=result.equipo_visitante,
+            goles_visitante=result.goles_visitante,
             status_partido=result.status_partido
         )
         for result in results
