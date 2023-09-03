@@ -144,7 +144,7 @@ def get_partidos_grupo(grupo_id: int):
     ]
 
 
-@router.get("/fase/{fase_id}", response_model=List[res.ResultadosFase])
+@router.get("/fase/{fase_id}", response_model=List[res.ResultadoFase])
 def get_partidos_fase(fase_id: int):
     """
     Devuelve todos los partidos de una fase, dada la fase_id
