@@ -27,6 +27,6 @@ class Partido(Base):
     goles_local = Column(Integer, nullable=True)
     goles_visitante = Column(Integer, nullable=True)
 
-    grupo = relationship("Grupo", back_populates="partidos")
-    local = relationship("Equipo", foreign_keys=[local_id])
-    visitante = relationship("Equipo", foreign_keys=[visitante_id])
+    # grupo = relationship("Grupo", back_populates="partidos")
+    # local = relationship("Equipo", foreign_keys=[local_id])
+    # visitante = relationship("Equipo", foreign_keys=[visitante_id])
