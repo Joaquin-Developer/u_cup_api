@@ -6,3 +6,8 @@ class Fase(BaseModel):
     id: int
     nombre: str
     ida_vuelta: bool
+
+
+class FaseActual(Fase):
+    """Schema para datos de fase actual"""
+
