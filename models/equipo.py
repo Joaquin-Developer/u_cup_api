@@ -10,5 +10,9 @@ class Equipo(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(VARCHAR(100))
+    pts = Column(Integer)
+    goles_favor = Column(Integer)
+    goles_contra = Column(Integer)
+    # estadisticas = relationship("EstadisticasGrupo", back_populates="equipo")
 
-    grupos = relationship("EquipoGrupo", back_populates="equipo")
+    # grupos = relationship("EquipoGrupo", back_populates="equipo")
