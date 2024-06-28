@@ -1,6 +1,7 @@
 import os
 from typing import List
-from pydantic import BaseSettings, AnyHttpUrl
+from pydantic import AnyHttpUrl
+from pydantic_settings import BaseSettings
 
 
 env = os.getenv("ENV") or "development"
