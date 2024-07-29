@@ -25,7 +25,7 @@ def execute_query(sql: str, return_data=False):
     return data
 
 
-@router.get("/fase_actual", response_model=Dict[int, str])
+@router.get("/fase_actual", response_model=Dict[str, str])
 def get_fase_actual():
     query = """
         WITH fase_actual AS (
@@ -51,6 +51,6 @@ def get_fase_actual():
     data = execute_query(sql=query, return_data=True)
 
     return {
-        "id": data[0][0],
+        "id": str(data[0][0]),
         "nombre": data[0][1]
     }
