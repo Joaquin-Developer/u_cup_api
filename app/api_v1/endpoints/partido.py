@@ -29,12 +29,12 @@ def _update_partido(partido_id: int, partido_data: PartidoUpdate, table: str):
 
 
     if table == "enfrentamientos":
-        penales_loc = partido_data.penales_local or "null"
-        penales_vis = partido_data.penales_visitante or "null"
+        p_l = partido_data.penales_local if partido_data.penales_local is not None else "null"
+        p_v = partido_data.penales_visitante if partido_data.penales_visitante is not None else "null"
         penales_sql = f"""
         ,
-            penales_local = {penales_loc},
-            penales_visitante = {penales_vis}
+            penales_local = {p_l},
+            penales_visitante = {p_v}
         """
     else:
         penales_sql = ""
