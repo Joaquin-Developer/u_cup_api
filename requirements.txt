@@ -2,3 +2,7 @@ mysqlclient
 fastapi
 pydantic
 pydantic_settings
+sqlalchemy
+requests
+pymysql
+mysql-connector-python
