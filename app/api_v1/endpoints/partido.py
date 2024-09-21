@@ -15,6 +15,16 @@ logging.basicConfig(level=logging.INFO)
 router = APIRouter()
 
 
+class Table:
+    PARTIDOS = "partidos"
+    ENFRENTAMIENTOS = "enfrentamientos"
+
+
+class StFase:
+    GENERAL = "general"
+    GRUPO = "grupo"
+
+
 def _update_partido(partido_id: int, partido_data: PartidoUpdate, table: str):
     """
     Actualizar el resultado de un partido segun la fase
@@ -88,11 +98,13 @@ def call_load_next_fase_service():
 def update_partido(partido_id: int, partido_data: PartidoUpdate):
     fase_actual = fase_final.get_fase_actual()["nombre"]
 
-    table = "partidos" if fase_actual == "Fase de Grupos" else "enfrentamientos"
-    statistic_fase = "grupo" if fase_actual == "Fase de Grupos" else "general"
+    table = Table.PARTIDOS if fase_actual == "Fase de Grupos" else Table.ENFRENTAMIENTOS
+    statistic_fase = StFase.GRUPO if fase_actual == "Fase de Grupos" else StFase.GENERAL
 
     local_id, visitante_id = _update_partido(partido_id, partido_data, table)
     update_statistics(statistic_fase, local_id, visitante_id)
-    call_load_next_fase_service()
+
+    if statistic_fase == StFase.GENERAL:
+        call_load_next_fase_service()
 
     return {"message": "Resultado actualizado"}
