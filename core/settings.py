@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
     DATABASE_DSN: str
     STATISTICS_SERVICE_URL: str = "http://127.0.0.1:8001"
+    LOAD_NEXT_FASE_SERVICE_URL: str = "http://127.0.0.1:8005/load_next_fase"
 
     class Config:
         env_file_encoding = "utf-8"
